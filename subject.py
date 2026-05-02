@@ -1,3 +1,6 @@
+import random
+
+
 class Subject:
     def __init__(self):
         self.id = f"{random.randint(1, 999):03d}"

@@ -1,6 +1,7 @@
 import os
 import pickle
 
+
 class Database:
     DATABASE_FILE = "students.data"
 
@@ -10,8 +11,11 @@ class Database:
                 pickle.dump([], f)
 
     def read_all(self):
-        with open(self.DATABASE_FILE, 'rb') as f:
-            return pickle.load(f)
+        try:
+            with open(self.DATABASE_FILE, 'rb') as f:
+                return pickle.load(f)
+        except (EOFError, pickle.UnpicklingError):
+            return []
 
     def write_all(self, students):
         with open(self.DATABASE_FILE, 'wb') as f:
@@ -27,6 +31,12 @@ class Database:
                 return student
         return None
 
+    def find_student_by_id(self, student_id):
+        for student in self.read_all():
+            if student.id == student_id:
+                return student
+        return None
+
     def save_student(self, student):
         students = self.read_all()
         for i, s in enumerate(students):
@@ -39,5 +49,6 @@ class Database:
 
     def delete_student(self, student_id):
         students = self.read_all()
-        students = [s for s in students if s.id != student_id]
-        self.write_all(students)
+        updated = [s for s in students if s.id != student_id]
+        self.write_all(updated)
+        return len(updated) < len(students)

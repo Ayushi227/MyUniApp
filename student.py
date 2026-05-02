@@ -1,5 +1,6 @@
 import random
 
+
 class Student:
     def __init__(self, name, email, password):
         self.id = f"{random.randint(1, 999999):06d}"
@@ -24,7 +25,6 @@ class Student:
             if s.id == subject_id:
                 self.subjects.remove(s)
                 return True
-        print(f"Subject {subject_id} not found in enrolment")
         return False
 
     def change_password(self, new_password):
@@ -37,6 +37,19 @@ class Student:
 
     def is_passing(self):
         return self.get_average_mark() >= 50
+
+    def get_overall_grade(self):
+        avg = self.get_average_mark()
+        if avg >= 85:
+            return 'HD'
+        elif avg >= 75:
+            return 'D'
+        elif avg >= 65:
+            return 'C'
+        elif avg >= 50:
+            return 'P'
+        else:
+            return 'Z'
 
     def __str__(self):
         return f"{self.name} :: {self.id} --> Email: {self.email}"
