@@ -1,5 +1,5 @@
-from student_controller import StudentController
-from admin_controller import AdminController
+from controllers.student_controller import StudentController
+from controllers.admin_controller import AdminController
 
 
 def main():

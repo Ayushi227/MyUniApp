@@ -1,10 +1,10 @@
 import re
-from student import Student
-from subject import Subject
-from database import Database
+from entities.student import Student
+from entities.subject import Subject
+from entities.database import Database
 
 EMAIL_PATTERN = re.compile(r'^[a-zA-Z]+\.[a-zA-Z]+@university\.com$')
-PASSWORD_PATTERN = re.compile(r'^(?=[A-Z])(?=(?:.*[a-zA-Z]){5}).*\d{3,}$')
+PASSWORD_PATTERN = re.compile(r'^[A-Z][a-zA-Z]{5,}\d{3,}$')
 
 
 def validate_credentials(email, password):
@@ -12,11 +12,6 @@ def validate_credentials(email, password):
 
 
 class StudentController:
-    """
-    Student subsystem controller.
-    Handles register, login, and the subject enrolment menu.
-    """
-
     def __init__(self):
         self.db = Database()
 
@@ -96,18 +91,13 @@ class StudentController:
                     print(f"        Subject {subject_id} not found in enrolment")
             elif choice == 'c':
                 print("        Updating Password")
-                while True:
-                    new_pass = input("        New Password: ").strip()
+                new_pass = input("        New Password: ").strip()
+                confirm = input("        Confirm Password: ").strip()
+                while new_pass != confirm:
+                    print("        Password does not match - try again")
                     confirm = input("        Confirm Password: ").strip()
-                    if new_pass != confirm:
-                        print("        Password does not match - try again")
-                        continue
-                    if not PASSWORD_PATTERN.match(new_pass):
-                        print("        Incorrect password format")
-                        continue
-                    student.change_password(new_pass)
-                    self.db.save_student(student)
-                    break
+                student.change_password(new_pass)
+                self.db.save_student(student)
             elif choice == 'x':
                 break
             else:

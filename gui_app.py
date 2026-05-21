@@ -1,36 +1,17 @@
-"""
-GUIUniApp - Graphical University Application
-Written by: Ayushi Khare
-
-Windows:
-  1. LoginWindow      - main entry point, reads from students.data
-  2. EnrolmentWindow  - lets logged-in student enrol in subjects
-  3. SubjectWindow    - displays enrolled subjects with marks and grades
-  4. ExceptionWindow  - modal dialog for all error/exception messages
-"""
-
 import tkinter as tk
-from tkinter import font as tkfont
-import re
-
-from database import Database
-from subject import Subject
-from student_controller import validate_credentials
+from entities.database import Database
+from entities.subject import Subject
+from controllers.student_controller import validate_credentials
 
 DB = Database()
 
-EMAIL_PATTERN = re.compile(r'^[a-zA-Z]+\.[a-zA-Z]+@university\.com$')
 
-
-# ---------------------------------------------------------------------------
-# Reusable exception/notification window (Window 4)
-# ---------------------------------------------------------------------------
 class ExceptionWindow(tk.Toplevel):
     def __init__(self, parent, message, title="Error"):
         super().__init__(parent)
         self.title(title)
         self.resizable(False, False)
-        self.grab_set()                    # modal
+        self.grab_set()
 
         self.configure(bg="#1e1e2e", padx=30, pady=20)
 
@@ -57,9 +38,6 @@ class ExceptionWindow(tk.Toplevel):
         self.geometry(f"+{x}+{y}")
 
 
-# ---------------------------------------------------------------------------
-# Window 3 – Subject list window
-# ---------------------------------------------------------------------------
 class SubjectWindow(tk.Toplevel):
     def __init__(self, parent, student):
         super().__init__(parent)
@@ -71,16 +49,12 @@ class SubjectWindow(tk.Toplevel):
         self._build()
 
     def _build(self):
-        header = tk.Label(self, text=f"Subjects for {self.student.name}",
-                          font=("Arial", 14, "bold"),
-                          bg="#1e1e2e", fg="#cba6f7")
-        header.pack(pady=(20, 4))
+        tk.Label(self, text=f"Subjects for {self.student.name}",
+                 font=("Arial", 14, "bold"),
+                 bg="#1e1e2e", fg="#cba6f7").pack(pady=(20, 4))
 
-        sub_count = len(self.student.subjects)
-        count_lbl = tk.Label(self,
-                             text=f"Enrolled in {sub_count} out of 4 subjects",
-                             font=("Arial", 10), bg="#1e1e2e", fg="#a6e3a1")
-        count_lbl.pack(pady=(0, 14))
+        tk.Label(self, text=f"Enrolled in {len(self.student.subjects)} out of 4 subjects",
+                 font=("Arial", 10), bg="#1e1e2e", fg="#a6e3a1").pack(pady=(0, 14))
 
         frame = tk.Frame(self, bg="#1e1e2e")
         frame.pack(fill="both", expand=True, padx=30)
@@ -92,20 +66,15 @@ class SubjectWindow(tk.Toplevel):
             for s in self.student.subjects:
                 row = tk.Frame(frame, bg="#313244", padx=12, pady=8)
                 row.pack(fill="x", pady=4)
-                tk.Label(row,
-                         text=f"Subject::{s.id}",
+                tk.Label(row, text=f"Subject::{s.id}",
                          font=("Arial", 11, "bold"),
                          bg="#313244", fg="#89dceb").pack(side="left")
-                tk.Label(row,
-                         text=f"Mark: {s.mark}",
+                tk.Label(row, text=f"Mark: {s.mark}",
                          font=("Arial", 11),
                          bg="#313244", fg="#cdd6f4").pack(side="left", padx=16)
-                grade_color = {
-                    'HD': '#a6e3a1', 'D': '#89b4fa',
-                    'C': '#f9e2af', 'P': '#94e2d5', 'Z': '#f38ba8'
-                }.get(s.grade, '#cdd6f4')
-                tk.Label(row,
-                         text=f"Grade: {s.grade}",
+                grade_color = {'HD': '#a6e3a1', 'D': '#89b4fa',
+                               'C': '#f9e2af', 'P': '#94e2d5', 'Z': '#f38ba8'}.get(s.grade, '#cdd6f4')
+                tk.Label(row, text=f"Grade: {s.grade}",
                          font=("Arial", 11, "bold"),
                          bg="#313244", fg=grade_color).pack(side="left")
 
@@ -125,9 +94,6 @@ class SubjectWindow(tk.Toplevel):
                   relief="flat", cursor="hand2", width=10).pack(pady=(0, 16))
 
 
-# ---------------------------------------------------------------------------
-# Window 2 – Enrolment window
-# ---------------------------------------------------------------------------
 class EnrolmentWindow(tk.Toplevel):
     def __init__(self, parent, student):
         super().__init__(parent)
@@ -156,19 +122,17 @@ class EnrolmentWindow(tk.Toplevel):
                  font=("Arial", 10),
                  bg="#1e1e2e", fg="#89b4fa").pack(pady=(0, 14))
 
-        enrol_btn = tk.Button(self, text="Enrol in a Subject",
-                              command=self._enrol,
-                              bg="#89b4fa", fg="#1e1e2e",
-                              font=("Arial", 11, "bold"),
-                              relief="flat", cursor="hand2", width=22, pady=6)
-        enrol_btn.pack(pady=6)
+        tk.Button(self, text="Enrol in a Subject",
+                  command=self._enrol,
+                  bg="#89b4fa", fg="#1e1e2e",
+                  font=("Arial", 11, "bold"),
+                  relief="flat", cursor="hand2", width=22, pady=6).pack(pady=6)
 
-        view_btn = tk.Button(self, text="View Enrolled Subjects",
-                             command=self._view_subjects,
-                             bg="#94e2d5", fg="#1e1e2e",
-                             font=("Arial", 11, "bold"),
-                             relief="flat", cursor="hand2", width=22, pady=6)
-        view_btn.pack(pady=6)
+        tk.Button(self, text="View Enrolled Subjects",
+                  command=self._view_subjects,
+                  bg="#94e2d5", fg="#1e1e2e",
+                  font=("Arial", 11, "bold"),
+                  relief="flat", cursor="hand2", width=22, pady=6).pack(pady=6)
 
         tk.Button(self, text="Logout",
                   command=self.destroy,
@@ -177,8 +141,7 @@ class EnrolmentWindow(tk.Toplevel):
                   relief="flat", cursor="hand2", width=14, pady=4).pack(pady=(18, 0))
 
     def _refresh_count(self):
-        n = len(self.student.subjects)
-        self.count_var.set(f"Enrolled in {n} out of 4 subjects")
+        self.count_var.set(f"Enrolled in {len(self.student.subjects)} out of 4 subjects")
 
     def _enrol(self):
         if len(self.student.subjects) >= 4:
@@ -199,9 +162,6 @@ class EnrolmentWindow(tk.Toplevel):
         SubjectWindow(self, self.student)
 
 
-# ---------------------------------------------------------------------------
-# Window 1 – Login window (main window)
-# ---------------------------------------------------------------------------
 class LoginWindow(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -227,25 +187,24 @@ class LoginWindow(tk.Tk):
         tk.Label(form, text="Email", font=("Arial", 10),
                  bg="#1e1e2e", fg="#cdd6f4", anchor="w").pack(fill="x")
         self.email_entry = tk.Entry(form, font=("Arial", 11),
-                                   bg="#313244", fg="#cdd6f4",
-                                   insertbackground="#cdd6f4",
-                                   relief="flat", bd=6)
+                                    bg="#313244", fg="#cdd6f4",
+                                    insertbackground="#cdd6f4",
+                                    relief="flat", bd=6)
         self.email_entry.pack(fill="x", pady=(2, 12), ipady=4)
 
         tk.Label(form, text="Password", font=("Arial", 10),
                  bg="#1e1e2e", fg="#cdd6f4", anchor="w").pack(fill="x")
         self.pass_entry = tk.Entry(form, font=("Arial", 11),
-                                   bg="#313244", fg="#cdd6f4",
-                                   insertbackground="#cdd6f4",
-                                   relief="flat", bd=6, show="*")
+                                    bg="#313244", fg="#cdd6f4",
+                                    insertbackground="#cdd6f4",
+                                    relief="flat", bd=6, show="*")
         self.pass_entry.pack(fill="x", pady=(2, 20), ipady=4)
 
-        login_btn = tk.Button(form, text="Login",
-                              command=self._login,
-                              bg="#89b4fa", fg="#1e1e2e",
-                              font=("Arial", 11, "bold"),
-                              relief="flat", cursor="hand2", pady=6)
-        login_btn.pack(fill="x")
+        tk.Button(form, text="Login",
+                  command=self._login,
+                  bg="#89b4fa", fg="#1e1e2e",
+                  font=("Arial", 11, "bold"),
+                  relief="flat", cursor="hand2", pady=6).pack(fill="x")
 
         self.bind("<Return>", lambda e: self._login())
 

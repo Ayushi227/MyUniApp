@@ -1,13 +1,7 @@
-from database import Database
+from entities.database import Database
 
 
 class AdminController:
-    """
-    Admin subsystem controller.
-    Handles all admin operations: show, group, partition, remove, clear.
-    Written by: Ayushi Khare
-    """
-
     def __init__(self):
         self.db = Database()
 
@@ -37,7 +31,7 @@ class AdminController:
         for grade in sorted(groups.keys()):
             for s in groups[grade]:
                 avg = s.get_average_mark()
-                print(f"        {grade} --> [{s.name} :: {s.id} --> GRADE: {grade:>2} - MARK: {avg:.2f}]")
+                print(f"        {grade}  --> [{s.name} :: {s.id} --> GRADE: {grade:>2} - MARK: {avg:.2f}]")
 
     def partition_students(self):
         students = self.db.read_all()
@@ -54,12 +48,11 @@ class AdminController:
         fail_str = ", ".join(
             f"{s.name} :: {s.id} --> GRADE: {s.get_overall_grade():>2} - MARK: {s.get_average_mark():.2f}"
             for s in failing
-        ) if failing else ""
-
+        )
         pass_str = ", ".join(
             f"{s.name} :: {s.id} --> GRADE: {s.get_overall_grade():>2} - MARK: {s.get_average_mark():.2f}"
             for s in passing
-        ) if passing else ""
+        )
 
         print(f"        FAIL --> [{fail_str}]")
         print(f"        PASS --> [{pass_str}]")
@@ -76,7 +69,6 @@ class AdminController:
         if confirm.upper() == 'Y':
             self.db.clear_all()
             print("        Students data cleared")
-        # If N, silently return to menu
 
     def admin_menu(self):
         while True:

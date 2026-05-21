@@ -20,4 +20,4 @@ class Subject:
             return 'Z'
 
     def __str__(self):
-        return f"Subject::{self.id} -- Mark:{self.mark:3d} -- Grade:{self.grade}"
+        return f"[ Subject::{self.id} -- mark = {self.mark} -- grade = {self.grade:>3} ]"
