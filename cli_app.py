@@ -1,5 +1,6 @@
 from controllers.student_controller import StudentController
 from controllers.admin_controller import AdminController
+from colors import CYAN, YELLOW, RED, RESET
 
 
 def main():
@@ -7,17 +8,17 @@ def main():
     admin_ctrl = AdminController()
 
     while True:
-        choice = input("University System: (A)dmin, (S)tudent, or X : ").strip().upper()
+        choice = input(f"{CYAN}University System: (A)dmin, (S)tudent, or X : {RESET}").strip().upper()
 
         if choice == 'S':
             student_ctrl.student_menu()
         elif choice == 'A':
             admin_ctrl.admin_menu()
         elif choice == 'X':
-            print("Thank You")
+            print(f"{YELLOW}Thank You{RESET}")
             break
         else:
-            print("Invalid option")
+            print(f"{RED}Invalid option{RESET}")
 
 
 if __name__ == "__main__":

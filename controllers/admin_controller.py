@@ -1,4 +1,5 @@
 from entities.database import Database
+from colors import RED, GREEN, YELLOW, CYAN, RESET
 
 
 class AdminController:
@@ -7,18 +8,18 @@ class AdminController:
 
     def show_students(self):
         students = self.db.read_all()
-        print("        Student List")
+        print(f"{CYAN}        Student List{RESET}")
         if not students:
-            print("        < Nothing to Display >")
+            print(f"{YELLOW}        < Nothing to Display >{RESET}")
             return
         for s in students:
             print(f"        {s.name} :: {s.id} --> Email: {s.email}")
 
     def group_by_grade(self):
         students = self.db.read_all()
-        print("        Grade Grouping")
+        print(f"{CYAN}        Grade Grouping{RESET}")
         if not students:
-            print("        < Nothing to Display >")
+            print(f"{YELLOW}        < Nothing to Display >{RESET}")
             return
 
         groups = {}
@@ -35,7 +36,7 @@ class AdminController:
 
     def partition_students(self):
         students = self.db.read_all()
-        print("        PASS/FAIL Partition")
+        print(f"{CYAN}        PASS/FAIL Partition{RESET}")
 
         passing = []
         failing = []
@@ -60,19 +61,19 @@ class AdminController:
     def remove_student(self, student_id):
         found = self.db.delete_student(student_id)
         if found:
-            print(f"        Removing Student {student_id} Account")
+            print(f"{YELLOW}        Removing Student {student_id} Account{RESET}")
         else:
-            print(f"        Student {student_id} does not exist")
+            print(f"{RED}        Student {student_id} does not exist{RESET}")
 
     def clear_database(self):
-        confirm = input("        Are you sure you want to clear the database (Y)ES/(N)O: ").strip()
+        confirm = input(f"{RED}        Are you sure you want to clear the database (Y)ES/(N)O: {RESET}").strip()
         if confirm.upper() == 'Y':
             self.db.clear_all()
-            print("        Students data cleared")
+            print(f"{YELLOW}        Students data cleared{RESET}")
 
     def admin_menu(self):
         while True:
-            choice = input("        Admin System (c/g/p/r/s/x): ").strip().lower()
+            choice = input(f"{CYAN}        Admin System (c/g/p/r/s/x): {RESET}").strip().lower()
 
             if choice == 's':
                 self.show_students()
@@ -84,9 +85,9 @@ class AdminController:
                 student_id = input("        Remove by ID: ").strip()
                 self.remove_student(student_id)
             elif choice == 'c':
-                print("        Clearing students database")
+                print(f"{YELLOW}        Clearing students database{RESET}")
                 self.clear_database()
             elif choice == 'x':
                 break
             else:
-                print("        Invalid option")
+                print(f"{RED}        Invalid option{RESET}")
