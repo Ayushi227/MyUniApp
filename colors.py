@@ -1,4 +1,4 @@
-# Simple ANSI colors for the CLI, matching the assignment sample I/O.
+# ANSI colors for the CLI
 RESET = "\033[0m"
 RED = "\033[91m"
 GREEN = "\033[92m"
