@@ -6,24 +6,24 @@
         "password": "Helloworld123",
         "subjects": [
             {
-                "id": "781",
-                "mark": 51,
-                "grade": "P"
+                "id": "723",
+                "mark": 92,
+                "grade": "HD"
             },
             {
-                "id": "346",
-                "mark": 26,
-                "grade": "Z"
+                "id": "299",
+                "mark": 75,
+                "grade": "D"
             },
             {
-                "id": "958",
-                "mark": 35,
-                "grade": "Z"
+                "id": "153",
+                "mark": 92,
+                "grade": "HD"
             },
             {
-                "id": "099",
-                "mark": 60,
-                "grade": "P"
+                "id": "851",
+                "mark": 94,
+                "grade": "HD"
             }
         ]
     },

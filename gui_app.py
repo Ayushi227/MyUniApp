@@ -7,17 +7,17 @@ DB = Database()
 
 
 class ExceptionWindow(tk.Toplevel):
-    def __init__(self, parent, message, title="Error"):
+    def __init__(self, parent, message, title="Error", remark = "!"):
         super().__init__(parent)
         self.title(title)
         self.resizable(False, False)
-        self.grab_set()
+        self.grab_set() #Parent window is disabled until this one is closed
 
         self.configure(bg="#1e1e2e", padx=30, pady=20)
 
-        icon_lbl = tk.Label(self, text="!", font=("Arial", 28, "bold"),
+        icon_lbl = tk.Label(self, text=remark, font=("Arial", 28, "bold"),
                             bg="#1e1e2e", fg="#f38ba8")
-        icon_lbl.pack(pady=(0, 8))
+        icon_lbl.pack(pady=(0, 8)) #Without side pararamtere, it will be centered by default. pady adds vertical spacing below the icon
 
         msg_lbl = tk.Label(self, text=message, font=("Arial", 11),
                            bg="#1e1e2e", fg="#cdd6f4",
@@ -29,7 +29,7 @@ class ExceptionWindow(tk.Toplevel):
                            activebackground="#74c7ec",
                            font=("Arial", 10, "bold"),
                            relief="flat", cursor="hand2",
-                           command=self.destroy)
+                           command=self.destroy) #When clicked, it will close the exception window and return control to the parent window
         ok_btn.pack()
 
         self.update_idletasks()
@@ -39,60 +39,100 @@ class ExceptionWindow(tk.Toplevel):
 
 
 class SubjectWindow(tk.Toplevel):
-    def __init__(self, parent, student):
+    def __init__(self, parent, student, on_close=None):
         super().__init__(parent)
         self.student = student
+        self.db = DB
+        self.on_close = on_close
         self.title(f"Enrolled Subjects - {student.name}")
         self.geometry("520x400")
         self.resizable(False, False)
         self.configure(bg="#1e1e2e")
+        
+        self.protocol("WM_DELETE_WINDOW", self._on_close)
         self._build()
-
+    
     def _build(self):
+        for w in self.winfo_children():
+            w.destroy()
+
         tk.Label(self, text=f"Subjects for {self.student.name}",
-                 font=("Arial", 14, "bold"),
-                 bg="#1e1e2e", fg="#cba6f7").pack(pady=(20, 4))
+                font=("Arial", 14, "bold"),
+                bg="#1e1e2e", fg="#cba6f7").pack(pady=(20, 4))
 
-        tk.Label(self, text=f"Enrolled in {len(self.student.subjects)} out of 4 subjects",
-                 font=("Arial", 10), bg="#1e1e2e", fg="#a6e3a1").pack(pady=(0, 14))
+        sub_count = len(self.student.subjects)
+        tk.Label(self,
+                text=f"Enrolled in {sub_count} out of 4 subjects",
+                font=("Arial", 10), bg="#1e1e2e", fg="#a6e3a1").pack(pady=(0, 14))
 
-        frame = tk.Frame(self, bg="#1e1e2e")
-        frame.pack(fill="both", expand=True, padx=30)
+        list_frame = tk.Frame(self, bg="#1e1e2e")
+        list_frame.pack(fill="both", expand=True, padx=30)
 
         if not self.student.subjects:
-            tk.Label(frame, text="No subjects enrolled yet.",
-                     font=("Arial", 11), bg="#1e1e2e", fg="#6c7086").pack(pady=20)
+            tk.Label(list_frame, text="No subjects enrolled yet.",
+                    font=("Arial", 11), bg="#1e1e2e", fg="#6c7086").pack(pady=20)
         else:
             for s in self.student.subjects:
-                row = tk.Frame(frame, bg="#313244", padx=12, pady=8)
-                row.pack(fill="x", pady=4)
-                tk.Label(row, text=f"Subject::{s.id}",
-                         font=("Arial", 11, "bold"),
-                         bg="#313244", fg="#89dceb").pack(side="left")
-                tk.Label(row, text=f"Mark: {s.mark}",
-                         font=("Arial", 11),
-                         bg="#313244", fg="#cdd6f4").pack(side="left", padx=16)
-                grade_color = {'HD': '#a6e3a1', 'D': '#89b4fa',
-                               'C': '#f9e2af', 'P': '#94e2d5', 'Z': '#f38ba8'}.get(s.grade, '#cdd6f4')
-                tk.Label(row, text=f"Grade: {s.grade}",
-                         font=("Arial", 11, "bold"),
-                         bg="#313244", fg=grade_color).pack(side="left")
+                self._render_subject_row(list_frame, s)
 
         avg = self.student.get_average_mark()
         status = "PASS" if self.student.is_passing() else "FAIL"
         status_color = "#a6e3a1" if status == "PASS" else "#f38ba8"
 
         footer = tk.Frame(self, bg="#1e1e2e")
-        footer.pack(pady=14)
+        footer.pack(pady=10)
         tk.Label(footer, text=f"Average Mark: {avg:.2f}   Status: ",
-                 font=("Arial", 11), bg="#1e1e2e", fg="#cdd6f4").pack(side="left")
+                font=("Arial", 11), bg="#1e1e2e", fg="#cdd6f4").pack(side="left")
         tk.Label(footer, text=status,
-                 font=("Arial", 11, "bold"), bg="#1e1e2e", fg=status_color).pack(side="left")
+                font=("Arial", 11, "bold"), bg="#1e1e2e", fg=status_color).pack(side="left")
 
-        tk.Button(self, text="Close", command=self.destroy,
-                  bg="#f38ba8", fg="#1e1e2e", font=("Arial", 10, "bold"),
-                  relief="flat", cursor="hand2", width=10).pack(pady=(0, 16))
+        tk.Button(self, text="Close", command=self._on_close,
+                bg="#f38ba8", fg="#1e1e2e", font=("Arial", 10, "bold"),
+                relief="flat", cursor="hand2", width=10).pack(pady=(0, 16))
 
+    def _render_subject_row(self, parent, s):
+        grade_color = {
+            'HD': '#a6e3a1', 'D': '#89b4fa',
+            'C': '#f9e2af', 'P': '#94e2d5', 'Z': '#f38ba8'
+        }.get(s.grade, '#cdd6f4')
+
+        row = tk.Frame(parent, bg="#313244", padx=12, pady=8)
+        row.pack(fill="x", pady=4)
+
+        info = tk.Frame(row, bg="#313244")
+        info.pack(side="left", fill="x", expand=True)
+
+        tk.Label(info, text=f"Subject: {s.id}",
+                font=("Arial", 11, "bold"),
+                bg="#313244", fg="#89dceb").pack(side="left")
+        tk.Label(info, text=f"  Mark: {s.mark}",
+                font=("Arial", 11),
+                bg="#313244", fg="#cdd6f4").pack(side="left")
+        tk.Label(info, text=f"  Grade: {s.grade}",
+                font=("Arial", 11, "bold"),
+                bg="#313244", fg=grade_color).pack(side="left")
+
+        tk.Button(row, text="Remove",
+        command=lambda sid=s.id: self._remove_subject(sid),
+        bg="#45475a", fg="#f38ba8",
+        activebackground="#585b70", activeforeground="#f38ba8",
+        font=("Arial", 9, "bold"),
+        relief="flat", cursor="hand2",
+        padx=10, pady=4
+        ).pack(side="right", padx=(0, 4))
+    
+    def _remove_subject(self, subject_id):
+        found = self.student.drop(subject_id)
+        if found:
+            self.db.save_student(self.student)
+            self._build()
+        else:
+            ExceptionWindow(self, f"Subject {subject_id} not found.", title="Error")
+
+    def _on_close(self):
+        if self.on_close:
+            self.on_close()
+        self.destroy()
 
 class EnrolmentWindow(tk.Toplevel):
     def __init__(self, parent, student):
@@ -112,7 +152,7 @@ class EnrolmentWindow(tk.Toplevel):
                  bg="#1e1e2e", fg="#cba6f7").pack(pady=(22, 2))
 
         self.name_lbl = tk.Label(self, text=f"Welcome, {self.student.name}",
-                                 font=("Arial", 11),
+                                 font=("Arial", 12),
                                  bg="#1e1e2e", fg="#a6e3a1")
         self.name_lbl.pack(pady=(0, 10))
 
@@ -141,7 +181,11 @@ class EnrolmentWindow(tk.Toplevel):
                   relief="flat", cursor="hand2", width=14, pady=4).pack(pady=(18, 0))
 
     def _refresh_count(self):
-        self.count_var.set(f"Enrolled in {len(self.student.subjects)} out of 4 subjects")
+        fresh = self.db.find_student_by_email(self.student.email)
+        if fresh:
+            self.student.subjects = fresh.subjects
+        n = len(self.student.subjects)
+        self.count_var.set(f"Enrolled in {n} out of 4 subjects")
 
     def _enrol(self):
         if len(self.student.subjects) >= 4:
@@ -156,10 +200,10 @@ class EnrolmentWindow(tk.Toplevel):
         ExceptionWindow(self,
                         f"Successfully enrolled in Subject-{subject.id}\n"
                         f"Mark: {subject.mark}  Grade: {subject.grade}",
-                        title="Enrolled")
+                        title="Enrolled", remark = "New Subject!")
 
     def _view_subjects(self):
-        SubjectWindow(self, self.student)
+        SubjectWindow(self, self.student, on_close=self._refresh_count)
 
 
 class LoginWindow(tk.Tk):
