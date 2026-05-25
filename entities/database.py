@@ -3,7 +3,6 @@ import os
 from entities.student import Student
 from entities.subject import Subject
 
-
 class Database:
     DATABASE_FILE = "students.data"
 
@@ -29,6 +28,7 @@ class Database:
                 students.append(student)
             return students
         except (json.JSONDecodeError, KeyError):
+            print("Key error")
             return []
 
     def write_all(self, students):

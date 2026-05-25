@@ -1,57 +1,60 @@
 [
     {
-        "id": "673358",
-        "name": "John Smith",
-        "email": "john.smith@university.com",
-        "password": "Helloworld123",
+        "id": "184205",
+        "name": "Emma Wilson",
+        "email": "emma.wilson@university.com",
+        "password": "Student123",
         "subjects": [
             {
-                "id": "723",
-                "mark": 92,
+                "id": "101",
+                "mark": 91,
                 "grade": "HD"
             },
             {
-                "id": "299",
-                "mark": 75,
+                "id": "102",
+                "mark": 78,
                 "grade": "D"
-            },
-            {
-                "id": "153",
-                "mark": 92,
-                "grade": "HD"
-            },
-            {
-                "id": "851",
-                "mark": 94,
-                "grade": "HD"
             }
         ]
     },
     {
-        "id": "762740",
-        "name": "Alen Jones",
-        "email": "alen.jones@university.com",
-        "password": "Helloworld123",
+        "id": "392816",
+        "name": "Noah Brown",
+        "email": "noah.brown@university.com",
+        "password": "Welcome456",
         "subjects": [
             {
-                "id": "541",
-                "mark": 55,
+                "id": "201",
+                "mark": 63,
                 "grade": "P"
             },
             {
-                "id": "455",
-                "mark": 57,
-                "grade": "P"
+                "id": "202",
+                "mark": 71,
+                "grade": "C"
             },
             {
-                "id": "742",
-                "mark": 55,
+                "id": "203",
+                "mark": 54,
                 "grade": "P"
+            }
+        ]
+    },
+    {
+        "id": "648927",
+        "name": "Ava Taylor",
+        "email": "ava.taylor@university.com",
+        "password": "Example789",
+        "subjects": [
+            {
+                "id": "301",
+                "mark": 42,
+                "grade": "Z"
             },
             {
-                "id": "097",
-                "mark": 85,
-                "grade": "HD"
+                "id": "302",
+                "mark": 47,
+                "grade": "Z"
             }
         ]
     }
